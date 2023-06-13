@@ -14,6 +14,7 @@ contract SeedWallet is Ownable, ReentrancyGuard {
     uint256 public _min;
     uint256 public _max;
     uint256 public _startAt;
+    uint256 public _endAt;
     uint256 public _cost;
     uint256 public _balanceTotal;
     bool public _soldOut;
@@ -34,16 +35,18 @@ contract SeedWallet is Ownable, ReentrancyGuard {
         uint256 min,
         uint256 max,
         uint256 startAt,
+        uint256 endAt,
         uint256 balanceTotal
     ) external onlyOwner {
         require(min <= max, "SEED: Min lower than max");
         _min = min;
         _max = max;
         _startAt = startAt;
+        _endAt=endAt;
         _balanceTotal = balanceTotal;
     }
 
-    function buy(uint256 amount) external onlyAfterStart nonReentrant {
+    function buy(uint256 amount) external onlyDuring nonReentrant {
         require(_max > 0, "SEED: Not initial");
         require(_min <= _max, "SEED: min higer than max");
         require(amount >= _min, "SEED: min invalid");
@@ -113,8 +116,8 @@ contract SeedWallet is Ownable, ReentrancyGuard {
         return false;
     }
 
-    modifier onlyAfterStart() {
-        require(block.timestamp >= _startAt, "SEED: Not started");
+    modifier onlyDuring() {
+        require(block.timestamp >= _startAt &&block.timestamp <= _endAt , "SEED: Not in time");
         _;
     }
 
