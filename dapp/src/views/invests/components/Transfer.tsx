@@ -27,10 +27,9 @@ export default function InvestView() {
   const [txHash, setTxHash] = React.useState<string>();
   const { isOpen, onClose, onOpen } = useDisclosure();
   const [toAddress, setToAddress] = useState("");
-  const { wallet } = useAppSelector((state) => state.account);
+  const { wallet,web3Provider } = useAppSelector((state) => state.account);
 
-  const [web3Provider, setWeb3Provider] =
-    React.useState<ethers.providers.Web3Provider>();
+ 
 
   const getRate = React.useCallback(async () => {
     const crowdContract = new CrowSaleContract();
@@ -44,6 +43,8 @@ export default function InvestView() {
   // }, [getRate]);
 
   const handleTransfer = async (values: any) => {
+    console.log(values);
+    
     try {
       const windaoContract = new WinDaoContract(web3Provider);
       const txhHash = await windaoContract.transfer(

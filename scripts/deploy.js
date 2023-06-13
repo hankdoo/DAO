@@ -26,9 +26,9 @@ async function main() {
   //     )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
   //   );
 
-  const WINDAO = await hre.ethers.deployContract("WINDAO");
-  await WINDAO.waitForDeployment();
-  console.log(`WINDAO address: ${WINDAO.target}`);
+  // const WINDAO = await hre.ethers.deployContract("WINDAO");
+  // await WINDAO.waitForDeployment();
+  // console.log(`WINDAO address: ${WINDAO.target}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

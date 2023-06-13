@@ -6,7 +6,10 @@ module.exports = {
   networks: {
     polygon_testnet: {
       url: `https://rpc-mumbai.maticvigil.com`,
-      accounts: [process.env.PRIVATE_KEY]
+      accounts: [process.env.PRIVATE_KEY],
     }
-  }
+  },
+  etherscan:{
+    apiKey:process.env.API_KEY
+  },
 };

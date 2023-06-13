@@ -25,8 +25,6 @@ export default class WinDaoContract extends BaseInterface {
   };
 
   transfer = async (toAddress: string, amount: number): Promise<any> => {
-    console.log(this._contract);
-
     const signer = await this._provider.getSigner();
     this._contract = new ethers.Contract(
       this._contractAddress,

@@ -28,27 +28,20 @@ export default function MainLayout({ children }: IProps) {
   const { wallet, web3Provider } = useAppSelector((state) => state.account);
   
   const onConnectMetamask = async () => {
-    const provider = new ethers.providers.JsonRpcProvider(getRPC());
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
     dispatch(setWeb3Provider(provider));
   };
 
   useEffect(() => {
-    console.log(web3Provider);
-    
     const init = async () => {
       if (!web3Provider) return;
       const signer =  web3Provider.getSigner();
-      console.log(signer);
-      
       const address = await signer.getAddress();
-      console.log(address);
-      
-      // const bigBalance = await signer.getBalance();
-      // const ethBalance = Number.parseFloat(ethers.utils.formatEther(bigBalance));
-      // const winDaoContract = new WinDaoContract(web3Provider || undefined);
-      // const balance = await winDaoContract.getBalanceByAddress(address);
-      // const balanceOfContract = await winDaoContract.getBalanceByAddress("0x5857DBB7fCA26B022aFf5eF6E46Ac58c812263a2");
-      // dispatch(setWalletInfo({ address, eth: ethBalance,wda:formatEtherUnit(balance.toString()) }));
+      const bigBalance = await signer.getBalance();
+      const ethBalance = Number.parseFloat(ethers.utils.formatEther(bigBalance));
+      const winDaoContract = new WinDaoContract(web3Provider || undefined);
+      const balance = await winDaoContract.getBalanceByAddress(address);
+      dispatch(setWalletInfo({ address, eth: ethBalance,wda:formatEtherUnit(balance.toString()) }));
     };
 
     init();
