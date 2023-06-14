@@ -1,4 +1,8 @@
 # DAO
 WINDAO 0x8B784D5CD20e7c61b82c3C7ead1A2C80a143824A
-
+BUSD   0xff49485533F75209D9F9c060CeB8cC304559641f
+SEEDWALLET 0x3899E7067f858AD5e7b7aDE2bD8c50dCebA45Cec
 npx hardhat --network polygon_testnet verify --contract "contracts/WinDAO.sol:WINDAO"   0x8B784D5CD20e7c61b82c3C7ead1A2C80a143824A
+
+
+ npx hardhat --network polygon_testnet verify --contract "contracts/SeedWallet.sol:SeedWallet" 0x3899E7067f858AD5e7b7aDE2bD8c50dCebA45Cec "0xff49485533F75209D9F9c060CeB8cC304559641f" "0x8B784D5CD20e7c61b82c3C7ead1A2C80a143824A"

@@ -19,7 +19,6 @@ contract SeedWallet is Ownable, ReentrancyGuard {
     uint256 public startAt;
     uint256 public endAt;
     uint256 public tgeStart;
-    uint256 public lockingTime;
     uint256 public tge;
     bool public soldOut;
     address public _exchangeToken;
@@ -47,6 +46,7 @@ contract SeedWallet is Ownable, ReentrancyGuard {
         uint256 _tge
     ) external onlyOwner {
         require(_min <= _max, "SEED: Min lower than max");
+        require(startAt < _endAt, "SEED: Start is not less than end");
         cap = _cap;
         min = _min;
         max = _max;
@@ -58,7 +58,7 @@ contract SeedWallet is Ownable, ReentrancyGuard {
 
     function buy(uint256 amount) external onlyDuring nonReentrant {
         require(max > 0, "SEED: Not initial");
-        require(amount >= min || amount <= max, "SEED:out of bound");
+        require(amount >= min && amount <= max, "SEED:out of bound");
         require(totalTokensSold + amount <= cap, "SEED: Higer than total");
         require(isWhiteList(msg.sender), "SEED: Address not whitelist");
 
@@ -69,7 +69,8 @@ contract SeedWallet is Ownable, ReentrancyGuard {
             soldOut = true;
             emit SoldOut(soldOut);
         }
-        uint256 total = amount * cost;
+
+        uint256 total = (amount * 1 ether)/cost;
         require(
             IERC20(_exchangeToken).transferFrom(
                 msg.sender,
@@ -103,20 +104,21 @@ contract SeedWallet is Ownable, ReentrancyGuard {
 
     function withDrawBusd() external onlyOwner {
         uint256 amount = IERC20(_exchangeToken).balanceOf(address(this));
-        require(IERC20(_exchangeToken).transfer(owner(), amount),"Transfer token failed");
+        require(
+            IERC20(_exchangeToken).transfer(owner(), amount),
+            "Transfer token failed"
+        );
     }
 
-    function setTgeStart(
-        uint256 _tgeStart,
-        uint256 _lockingTime
-    ) external onlyOwner {
-        require(tgeStart >= block.timestamp && tgeStart>=endAt, "SEED: Tge start invalid");
+    function setTgeStart(uint256 _tgeStart) external onlyOwner {
+        require(
+            tgeStart >= block.timestamp && tgeStart >= endAt,
+            "SEED: Tge start invalid"
+        );
         tgeStart = _tgeStart;
-        lockingTime = _lockingTime + tgeStart;
     }
 
     function claimTGE() external onlyTgeStart nonReentrant {
-        require(block.timestamp >= lockingTime, "SEED: Lock in time");
         User storage user = users[msg.sender];
         require(!user.isClaimTGE, "SEED: Already claim tge");
         uint256 amount = (user.balance * tge) / 100;
@@ -127,7 +129,10 @@ contract SeedWallet is Ownable, ReentrancyGuard {
     function _claimToken(uint256 amount) internal {
         uint256 balanceOfSeed = IERC20(_token).balanceOf(address(this));
         require(balanceOfSeed >= amount, "Insufficent token");
-        require(IERC20(_token).transfer(msg.sender, amount),"Transfer token failed");
+        require(
+            IERC20(_token).transfer(msg.sender, amount),
+            "Transfer token failed"
+        );
         emit ClaimWDA(msg.sender, amount);
     }
 
@@ -140,7 +145,7 @@ contract SeedWallet is Ownable, ReentrancyGuard {
     }
 
     modifier onlyTgeStart() {
-        require(block.timestamp >= tgeStart, "SEED: early for tge");
+        require(tgeStart > 0, "SEED: early for tge");
         _;
     }
 }
