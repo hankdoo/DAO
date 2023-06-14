@@ -13,3 +13,7 @@ export const getAuctionAddress =()=> getAddress(SMART_ADDRESS.AUCTION);
 export const getIptAddress =()=> getAddress(SMART_ADDRESS.IPT);
 
 export const getWinDaoAddress =()=> getAddress(SMART_ADDRESS.WINDAO);
+export const getBUSDAddress =()=> getAddress(SMART_ADDRESS.BUSD);
+export const getSeedWalletAddress =()=> getAddress(SMART_ADDRESS.SEEDWALLET);
+
+

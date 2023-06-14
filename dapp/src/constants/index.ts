@@ -55,4 +55,5 @@ export const menus: IMenu[] = [
   {name: 'Invest', url: '/'},
   {name: 'Market', url: '/market'},
   {name: 'Auction', url: '/auction'},
+  {name: 'Tokenomic', url: '/tokenomic'},
 ]
