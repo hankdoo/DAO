@@ -27,10 +27,6 @@ export default class BusdContract extends BaseInterface {
       this._abis,
       signer
     );
-
-    console.log(this._contract);
-    
-
     const tx: TransactionResponse = await this._contract.approve(spender,amount);
     return this._handleTransactionResponse(tx);
   };

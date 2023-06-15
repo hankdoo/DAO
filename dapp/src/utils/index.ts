@@ -52,3 +52,19 @@ export const getToast = (
     duration: 3000,
   };
 };
+export function timeStampToDatetime(timeStamp: number,pattern:string) {
+  let date = new Date(timeStamp*1000)
+  pattern= pattern.replace("YYYY",date.getFullYear().toString())
+  pattern= pattern.replace("MM",date.getMonth().toString())
+  pattern= pattern.replace("DD",date.getDate().toString())
+  pattern= pattern.replace("hh",date.getHours().toString())
+  pattern= pattern.replace("mm",date.getMinutes().toString())
+  pattern= pattern.replace("ss",date.getSeconds().toString())
+  
+  return pattern;
+}
+
+export function curentTimeStamp() {
+  const currentTimestamp = Math.floor(Date.now() / 1000);
+  return currentTimestamp;
+}

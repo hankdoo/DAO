@@ -46,6 +46,8 @@ export default function MainLayout({ children }: IProps) {
 
     init();
   }, [web3Provider]);
+
+  
   return (
     <Flex
       w={{ base: "full", lg: "70%" }}

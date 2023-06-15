@@ -1,58 +1,108 @@
 declare var window: any;
 import { IPackage, IRate } from "@/_types_";
 import { SuccessModal } from "@/components";
-import CrowSaleContract from "@/contracts/CrowdSaleContract";
 import SeedRoundContract from "@/contracts/SeedRoundContract";
-import WinDaoContract from "@/contracts/WinDaoContract";
-import { useAppSelector } from "@/reduxs/hooks";
+import { AccountState } from "@/reduxs/accounts/account.slices";
+import { curentTimeStamp, numberFormat, timeStampToDatetime } from "@/utils";
 import {
   Button,
+  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Input,
   useDisclosure,
 } from "@chakra-ui/react";
-import { ethers } from "ethers";
+import { formatEther } from "ethers/lib/utils";
 import { Field, Form, Formik } from "formik";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 interface IProps {
-  web3Provider: ethers.providers.JsonRpcProvider;
+  account?: AccountState;
 }
-export default function SeedRound({ web3Provider }: IProps) {
-  const [rate, setRate] = React.useState<IRate>({ bnbRate: 0, usdtRate: 0 });
-  const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
-  const [pak, setPak] = React.useState<IPackage>();
+
+export default function SeedRound({ account }: IProps) {
   const [txHash, setTxHash] = React.useState<string>();
   const { isOpen, onClose, onOpen } = useDisclosure();
-  const [toAddress, setToAddress] = useState("");
+  const [isClaiming, setIsClaiming] = useState(false);
+  const [balance, setbalance] = useState(0);
+  const [timeToClaim, setTimeToClaim] = useState<number>(0);
+  const [startTime, setStartTime] = useState<number>(0);
+  const [balanceOfSeed, setBalanceOfseed] = useState<number>(0);
+  const [totalTokensSold, setTotalTokensSold] = useState<number>(0);
+  const [tge, setTge] = useState<number>(0);
+  const [cost, setCost] = useState<number>(0);
+  const [capacity, setCapacity] = useState<number>(0);
+  const [endTime, setEndTime] = useState<number>(0);
+  const [validate, setValidate] = useState<any>({
+    min: null,
+    max: null,
+  });
+  useEffect(() => {
+    const init = async () => {
+      if (account?.web3Provider && account.wallet) {
+        const seedRoundContract = new SeedRoundContract(account?.web3Provider);
+        Promise.all([
+          await seedRoundContract.getBalanceByAddress(account?.wallet?.address),
+          await seedRoundContract.getTgeStart(),
+          await seedRoundContract.getStartTime(),
+          await seedRoundContract.getEndTime(),
+          await seedRoundContract.getMin(),
+          await seedRoundContract.getMax(),
+          await seedRoundContract.getBalanceOfSeed(),
+          await seedRoundContract.getTotalTokensSold(),
+          await seedRoundContract.getTge(),
+          await seedRoundContract.getCost(),
+          await seedRoundContract.getCapacity(),
+        ]).then((values) => {
+          setbalance(Number(formatEther(values[0])));
+          setTimeToClaim(Number(values[1].toString()));
+          setStartTime(Number(values[2].toString()));
+          setEndTime(Number(values[3].toString()));
+          setValidate({
+            min: Number(formatEther(values[4].toString())),
+            max: Number(formatEther(values[5].toString())),
+          });
+          setBalanceOfseed(Number(formatEther(values[6].toString())));
+          setTotalTokensSold(Number(formatEther(values[7].toString())));
+          setTge(Number((values[8].toString())));
+          setCost(Number(formatEther(values[9].toString())));
+          setCapacity(Number(formatEther(values[10].toString())));
+        });
+      }
+    };
+    init();
+  }, [account, txHash]);
 
-  const getRate = React.useCallback(async () => {
-    const crowdContract = new CrowSaleContract();
-    const bnbRate = await crowdContract.getBnbRate();
-    const usdtRate = await crowdContract.getUsdtRate();
-    setRate({ bnbRate, usdtRate });
-  }, []);
+  const handleBuy = useCallback(
+    async (values: any) => {
+      try {
+        const seedRoundContract = new SeedRoundContract(account?.web3Provider);
+        const txhHash = await seedRoundContract?.buy(values.amount);
+        setTxHash(txhHash);
+        onOpen();
+      } catch (error) {
+        alert(error?.reason);
+      }
+    },
+    [account]
+  );
 
-  const handleBuy = async (values: any) => {
-    console.log(values);
-
+  const handleClaim = useCallback(async () => {
     try {
-      const seedRoundContract = new SeedRoundContract(web3Provider);
-      const txhHash = await seedRoundContract.buy(values.amount);
-      console.log(txhHash);
+      const seedRoundContract = new SeedRoundContract(account?.web3Provider);
+      const txhHash = await seedRoundContract.claim();
       setTxHash(txhHash);
+      onOpen();
     } catch (error) {
       alert(error?.reason);
-      console.log(error);
-      
     }
-  };
+  }, [account]);
+
   return (
     <>
       <Formik
-        initialValues={{ toAddress: "" }}
+        initialValues={{ amount: "" }}
         onSubmit={async (values, actions) => {
           await handleBuy(values);
           actions.setSubmitting(false);
@@ -60,6 +110,52 @@ export default function SeedRound({ web3Provider }: IProps) {
       >
         {(props) => (
           <Form>
+            <div>
+              Period: {"[ "}
+              {startTime == 0 || endTime == 0
+                ? " Not initial"
+                : timeStampToDatetime(startTime, "YYYY-MM-DD hh:mm:ss") +
+                  " ----- " +
+                  timeStampToDatetime(endTime, "YYYY-MM-DD hh:mm:ss")}
+              {" ]"}
+            </div>
+
+            <div>
+              Time to claim:{" "}
+              {timeToClaim == 0
+                ? "Not started yet"
+                : timeStampToDatetime(timeToClaim, "YYYY-MM-DD hh:mm:ss")}
+            </div>
+            <div>Capacity: {numberFormat(capacity)}</div>
+            <div>Total token sold: {numberFormat(totalTokensSold)}</div>
+            <div>Balance of seed: {numberFormat(balanceOfSeed)}</div>
+            <Flex align={"baseline"}>
+              <FormLabel alignItems={"center"}>
+                Balance: {numberFormat(balance)} WDA
+                <div>Value received: {numberFormat((balance*tge)/100)} WDA</div>
+              </FormLabel>
+
+              <Button
+                mt={4}
+                ml={4}
+                colorScheme="teal"
+                isLoading={isClaiming}
+                disabled={
+                  !account?.web3Provider ||
+                  balance == 0 ||
+                  timeToClaim == 0 ||
+                  curentTimeStamp() < timeToClaim
+                }
+                variant="primary"
+                onClick={async () => {
+                  setIsClaiming(true);
+                  await handleClaim();
+                  setIsClaiming(false);
+                }}
+              >
+                Claim
+              </Button>
+            </Flex>
             <Field name="amount">
               {({ field, form }) => (
                 <FormControl
@@ -67,8 +163,21 @@ export default function SeedRound({ web3Provider }: IProps) {
                   mt={4}
                 >
                   <FormLabel>Amount</FormLabel>
-                  <Input {...field} />
-                  <FormErrorMessage>{form.errors.amount}</FormErrorMessage>
+                  <Flex>
+                    <Input
+                      {...field}
+                      type="number"
+                      min={validate.min}
+                      max={validate.max}
+                    />
+                    <Input
+                      ml={4}
+                      {...field}
+                      type="text"
+                      value={Number(props.values.amount) / cost + " BUSD"}
+                      disabled={true}
+                    />
+                  </Flex>
                 </FormControl>
               )}
             </Field>
@@ -78,8 +187,15 @@ export default function SeedRound({ web3Provider }: IProps) {
               isLoading={props.isSubmitting}
               type="submit"
               variant="primary"
+              disabled={
+                !account?.web3Provider ||
+                !(
+                  curentTimeStamp() >= startTime && curentTimeStamp() <= endTime
+                ) ||
+                balanceOfSeed == 0
+              }
             >
-              Buy
+              {(balanceOfSeed == 0 && "Sold out") || "Buy"}
             </Button>
           </Form>
         )}

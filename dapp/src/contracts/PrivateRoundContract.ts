@@ -8,7 +8,7 @@ import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { formatToEth } from "@/utils";
 import BusdContract from "./BusdContract";
 
-export default class SeedRoundContract extends BaseInterface {
+export default class PrivateRoundContract extends BaseInterface {
   constructor(provider?: ethers.providers.JsonRpcProvider) {
     const rpcProvider = new ethers.providers.JsonRpcProvider(getRPC());
     super(provider || rpcProvider, getSeedWalletAddress(), getSeedWalletAbi());

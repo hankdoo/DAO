@@ -43,17 +43,14 @@ export default function InvestView() {
   // }, [getRate]);
 
   const handleTransfer = async (values: any) => {
-    console.log(values);
-    
     try {
       const windaoContract = new WinDaoContract(web3Provider);
       const txhHash = await windaoContract.transfer(
         values.toAddress,
         values.amount
       );
-      console.log(txhHash);
     } catch (error) {
-      console.log(error);
+      alert(error?.reason)
     }
   };
   return (

@@ -19,7 +19,7 @@ interface IProps extends Omit<ModalProps, "children"> {
 export default function SuccessModal({ hash, title, ...props }: IProps) {
   const onNavigation = () => {
     if (window) {
-      window.open(`https://testnet.bscscan.com/tx/${hash}`, '_blank');
+      window.open(`https://mumbai.polygonscan.com/tx/${hash}`, '_blank');
     }
   };
 
