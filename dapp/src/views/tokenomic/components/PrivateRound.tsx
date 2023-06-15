@@ -1,9 +1,9 @@
 declare var window: any;
 import { IPackage, IRate } from "@/_types_";
 import { SuccessModal } from "@/components";
-import PrivateRoundContract from "@/contracts/privateRoundContract";
-import privateRoundContract from "@/contracts/privateRoundContract";
-import { AccountState } from "@/reduxs/accounts/account.slices";
+import PrivateRoundContract from "@/contracts/PrivateRoundContract";
+import { AccountState, setBalanceChange } from "@/reduxs/accounts/account.slices";
+import { useAppDispatch } from "@/reduxs/hooks";
 import { curentTimeStamp, numberFormat, timeStampToDatetime } from "@/utils";
 import {
   Button,
@@ -39,6 +39,8 @@ export default function PrivateRound({ account }: IProps) {
     min: null,
     max: null,
   });
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
     const init = async () => {
       if (account?.web3Provider && account.wallet) {
@@ -82,20 +84,25 @@ export default function PrivateRound({ account }: IProps) {
         const txhHash = await privateRoundContract?.buy(values.amount);
         setTxHash(txhHash);
         onOpen();
-      } catch (error) {
+      } catch (error:any) {
         alert(error?.reason);
       }
     },
     [account]
   );
 
+  useEffect(() => {
+    if (txHash) {
+      dispatch(setBalanceChange(!account?.balanceChange));
+    }
+  }, [txHash]);
   const handleClaim = useCallback(async () => {
     try {
       const privateRoundContract = new PrivateRoundContract(account?.web3Provider);
       const txhHash = await privateRoundContract.claim();
       setTxHash(txhHash);
       onOpen();
-    } catch (error) {
+    } catch (error:any) {
       alert(error?.reason);
     }
   }, [account]);
@@ -158,7 +165,7 @@ export default function PrivateRound({ account }: IProps) {
               </Button>
             </Flex>
             <Field name="amount">
-              {({ field, form }) => (
+              {({ field, form }:any) => (
                 <FormControl
                   isInvalid={form.errors.name && form.touched.name}
                   mt={4}

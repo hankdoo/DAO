@@ -5,6 +5,7 @@ import { ethers } from "ethers";
 export interface AccountState {
   wallet?: IWalletInfo;
   web3Provider?: ethers.providers.JsonRpcProvider;
+  balanceChange?: boolean;
 }
 
 const initialState: AccountState = {}
@@ -19,10 +20,13 @@ export const accountSlice = createSlice({
     setWalletInfo: (state, action: PayloadAction<IWalletInfo>) => {
       state.wallet = action.payload;
     },   
+    setBalanceChange: (state, action: PayloadAction<boolean>) => {
+      state.balanceChange = action.payload;
+    },   
   },
 })
 
-export const { setWalletInfo, setWeb3Provider } = accountSlice.actions;
+export const { setWalletInfo, setWeb3Provider,setBalanceChange } = accountSlice.actions;
 export default accountSlice.reducer;
 
 

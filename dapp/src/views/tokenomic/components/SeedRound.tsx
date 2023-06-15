@@ -2,7 +2,11 @@ declare var window: any;
 import { IPackage, IRate } from "@/_types_";
 import { SuccessModal } from "@/components";
 import SeedRoundContract from "@/contracts/SeedRoundContract";
-import { AccountState } from "@/reduxs/accounts/account.slices";
+import {
+  AccountState,
+  setBalanceChange,
+} from "@/reduxs/accounts/account.slices";
+import { useAppDispatch } from "@/reduxs/hooks";
 import { curentTimeStamp, numberFormat, timeStampToDatetime } from "@/utils";
 import {
   Button,
@@ -38,6 +42,8 @@ export default function SeedRound({ account }: IProps) {
     min: null,
     max: null,
   });
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
     const init = async () => {
       if (account?.web3Provider && account.wallet) {
@@ -65,7 +71,7 @@ export default function SeedRound({ account }: IProps) {
           });
           setBalanceOfseed(Number(formatEther(values[6].toString())));
           setTotalTokensSold(Number(formatEther(values[7].toString())));
-          setTge(Number((values[8].toString())));
+          setTge(Number(values[8].toString()));
           setCost(Number(formatEther(values[9].toString())));
           setCapacity(Number(formatEther(values[10].toString())));
         });
@@ -81,12 +87,18 @@ export default function SeedRound({ account }: IProps) {
         const txhHash = await seedRoundContract?.buy(values.amount);
         setTxHash(txhHash);
         onOpen();
-      } catch (error) {
+      } catch (error: any) {
         alert(error?.reason);
       }
     },
     [account]
   );
+
+  useEffect(() => {
+    if (txHash) {
+      dispatch(setBalanceChange(!account?.balanceChange));
+    }
+  }, [txHash]);
 
   const handleClaim = useCallback(async () => {
     try {
@@ -94,7 +106,7 @@ export default function SeedRound({ account }: IProps) {
       const txhHash = await seedRoundContract.claim();
       setTxHash(txhHash);
       onOpen();
-    } catch (error) {
+    } catch (error: any) {
       alert(error?.reason);
     }
   }, [account]);
@@ -132,7 +144,9 @@ export default function SeedRound({ account }: IProps) {
             <Flex align={"baseline"}>
               <FormLabel alignItems={"center"}>
                 Balance: {numberFormat(balance)} WDA
-                <div>Value received: {numberFormat((balance*tge)/100)} WDA</div>
+                <div>
+                  Value received: {numberFormat((balance * tge) / 100)} WDA
+                </div>
               </FormLabel>
 
               <Button
@@ -157,7 +171,7 @@ export default function SeedRound({ account }: IProps) {
               </Button>
             </Flex>
             <Field name="amount">
-              {({ field, form }) => (
+              {({ field, form }: any) => (
                 <FormControl
                   isInvalid={form.errors.name && form.touched.name}
                   mt={4}

@@ -2,6 +2,7 @@ export interface IWalletInfo {
   address: string;
   eth: number;
   wda: number;
+  busd: number;
 }
 
 export interface IRate {

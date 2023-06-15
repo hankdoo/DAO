@@ -31,6 +31,11 @@ export default class BusdContract extends BaseInterface {
     return this._handleTransactionResponse(tx);
   };
 
+  
+  getBalanceByAddress = async (address: string): Promise<any> => {
+    return await this._contract.balanceOf(address);
+  };
+
   // getBalanceByAddress = async (): Promise<IAuctionInfo[]> => {
   //   const rs = await this._contract.getAuctionByStatus(true);
   //   const results: IAuctionInfo[] = [];

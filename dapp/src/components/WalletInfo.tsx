@@ -6,9 +6,10 @@ interface IProps {
   address?: string;
   amountETH: number;
   amountWDA: number;
+  amountBUSD: number;
 }
 
-export default function WalletInfo({address, amountETH,amountWDA}: IProps) {
+export default function WalletInfo({address, amountETH,amountWDA,amountBUSD}: IProps) {
   return (
     <Button variant="outline" ml="10px">
       <HStack>
@@ -19,6 +20,10 @@ export default function WalletInfo({address, amountETH,amountWDA}: IProps) {
       <HStack>
         <Image src='/wda.jfif' w="25px" alt="wda" ml="20px" borderRadius={100} />        
         <Text>{numberFormat(amountWDA)}</Text>
+      </HStack>
+      <HStack>
+        <Image src='/busd.png' w="25px" alt="wda" ml="20px" borderRadius={100} />        
+        <Text>{numberFormat(amountBUSD)}</Text>
       </HStack>
     </Button>
   )

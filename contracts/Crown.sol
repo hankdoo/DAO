@@ -10,6 +10,7 @@ contract CrownNFT is ERC721, Ownable {
     uint256 public constant MAX_SUPPLY = 10;
     string private _baseUri;
 
+    event Mint(address to,uint256 tokenId);
     constructor() ERC721("CrownNFT", "CROWN") {
         _tokenCounter.increment();
     }
@@ -19,6 +20,7 @@ contract CrownNFT is ERC721, Ownable {
         require(tokenId <= MAX_SUPPLY, "CROWNNFT: More than max supply");
         _mint(to, tokenId);
         _tokenCounter.increment();
+        emit Mint(to,tokenId);
         return tokenId;
     }
     
@@ -30,4 +32,12 @@ contract CrownNFT is ERC721, Ownable {
      function setBaseUri(string calldata baseUri) external onlyOwner{
          _baseUri = baseUri;
     }
+
+    function listTokenIds(address owner) external view  returns(uint256[] memory ){
+        uint256 balance = balanceOf(owner);
+        for (uint i = 0; i < balance; i++) {
+            
+        }
+    }
+
 }
