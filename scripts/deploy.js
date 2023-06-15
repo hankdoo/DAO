@@ -36,6 +36,9 @@ async function main() {
   const SeedWallet = await hre.ethers.deployContract("SeedWallet",["0xff49485533F75209D9F9c060CeB8cC304559641f","0x8B784D5CD20e7c61b82c3C7ead1A2C80a143824A"]);
   await SeedWallet.waitForDeployment();
   console.log(`SeedWallet address: ${SeedWallet.target}`);
+  //   const PrivateWallet = await hre.ethers.deployContract("PrivateWallet",["0xff49485533F75209D9F9c060CeB8cC304559641f","0x8B784D5CD20e7c61b82c3C7ead1A2C80a143824A"]);
+  // await PrivateWallet.waitForDeployment();
+  // console.log(`PrivateWallet address: ${PrivateWallet.target}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

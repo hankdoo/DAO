@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract SeedWallet is Ownable, ReentrancyGuard {
+contract PrivateWallet is Ownable, ReentrancyGuard {
     struct User {
         uint256 balance;
         bool isClaimTGE;
@@ -45,8 +45,8 @@ contract SeedWallet is Ownable, ReentrancyGuard {
         uint256 _cost,
         uint256 _tge
     ) external onlyOwner {
-        require(_min <= _max, "SEED: Min lower than max");
-        require(startAt < _endAt, "SEED: Start is not less than end");
+        require(_min <= _max, "PRIVATE: Min lower than max");
+        require(startAt < _endAt, "PRIVATE: Start is not less than end");
         cap = _cap;
         min = _min;
         max = _max;
@@ -57,10 +57,10 @@ contract SeedWallet is Ownable, ReentrancyGuard {
     }
 
     function buy(uint256 amount) external onlyDuring nonReentrant {
-        require(max > 0, "SEED: Not initial");
-        require(amount >= min && amount <= max, "SEED:out of bound");
-        require(totalTokensSold + amount <= cap, "SEED: Higer than total");
-        require(isWhiteList(msg.sender), "SEED: Address not whitelist");
+        require(max > 0, "PRIVATE: Not initial");
+        require(amount >= min && amount <= max, "PRIVATE:out of bound");
+        require(totalTokensSold + amount <= cap, "PRIVATE: Higer than total");
+        require(isWhiteList(msg.sender), "PRIVATE: Address not whitelist");
 
         User storage user = users[msg.sender];
         user.balance += amount;
@@ -96,7 +96,7 @@ contract SeedWallet is Ownable, ReentrancyGuard {
     function setCap(uint256 _cap) external onlyOwner {
         require(
             _cap >= cap,
-            "SEED: cap have to greater than or equal to old cap"
+            "PRIVATE: cap have to greater than or equal to old cap"
         );
         cap = _cap;
     }
@@ -122,7 +122,7 @@ contract SeedWallet is Ownable, ReentrancyGuard {
         whiteList = _users;
     }
 
-    function getBalanceOfSeed() public view returns (uint256) {
+    function getBalanceOfPrivate() public view returns (uint256) {
         return cap - totalTokensSold;
     }
 
@@ -137,14 +137,14 @@ contract SeedWallet is Ownable, ReentrancyGuard {
     function setTgeStart(uint256 _tgeStart) external onlyOwner {
         require(
             _tgeStart >= block.timestamp && _tgeStart >= endAt,
-            "SEED: Tge start invalid"
+            "PRIVATE: Tge start invalid"
         );
         tgeStart = _tgeStart;
     }
 
     function claimTGE() external onlyTgeStart nonReentrant {
         User storage user = users[msg.sender];
-        require(!user.isClaimTGE, "SEED: Already claim tge");
+        require(!user.isClaimTGE, "PRIVATE: Already claim tge");
         uint256 amount = (user.balance * tge) / 100;
         _claimToken(amount);
         user.balance=0;
@@ -152,8 +152,8 @@ contract SeedWallet is Ownable, ReentrancyGuard {
     }
 
     function _claimToken(uint256 amount) internal {
-        uint256 balanceOfSeed = IERC20(_token).balanceOf(address(this));
-        require(balanceOfSeed >= amount, "Insufficent token");
+        uint256 balanceOfPrivate = IERC20(_token).balanceOf(address(this));
+        require(balanceOfPrivate >= amount, "Insufficent token");
         require(
             IERC20(_token).transfer(msg.sender, amount),
             "Transfer token failed"
@@ -164,13 +164,13 @@ contract SeedWallet is Ownable, ReentrancyGuard {
     modifier onlyDuring() {
         require(
             block.timestamp >= startAt && block.timestamp <= endAt,
-            "SEED: Not in time"
+            "PRIVATE: Not in time"
         );
         _;
     }
 
     modifier onlyTgeStart() {
-        require(tgeStart > 0 &&block.timestamp>=tgeStart, "SEED: early for tge");
+        require(tgeStart > 0 &&block.timestamp>=tgeStart, "PRIVATE: early for tge");
         _;
     }
 }
