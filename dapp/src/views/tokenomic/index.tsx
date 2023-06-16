@@ -21,11 +21,13 @@ export default function TokenomicView() {
         </TabList>
         <TabPanels>
           <TabPanel p={4} key={1}>
-            <SeedRound account={account} />
+          <PrivateRound account={account} />
+
           </TabPanel>
 
           <TabPanel p={4} key={2}>
-            <PrivateRound account={account} />
+          <SeedRound account={account} />
+
           </TabPanel>
         </TabPanels>
       </Tabs>

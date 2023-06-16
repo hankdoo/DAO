@@ -188,7 +188,7 @@ export default function SeedRound({ account }: IProps) {
                       ml={4}
                       {...field}
                       type="text"
-                      value={Number(props.values.amount) / cost + " BUSD"}
+                      value={numberFormat(Number(props.values.amount) / cost) + " BUSD"}
                       disabled={true}
                     />
                   </Flex>
