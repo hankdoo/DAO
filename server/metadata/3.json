@@ -1,0 +1,19 @@
+{
+  "description": "A unique Crown in a collection of Crowns :)",
+  "attributes": [
+    {
+      "trait_type": "Weather",
+      "value": "Night"
+    },
+    {
+      "trait_type": "Crown",
+      "value": "Cheese"
+    },
+    {
+      "trait_type": "Extra",
+      "value": "none"
+    }
+  ],
+  "image": "https://firebasestorage.googleapis.com/v0/b/dao-fe83d.appspot.com/o/image%2F3.jpeg?alt=media",
+  "name": "Crown #3"
+}

@@ -7,20 +7,19 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 contract CrownNFT is ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
-
+    using Strings for uint256;
     Counters.Counter private _tokenCounter;
     uint256 public constant MAX_SUPPLY = 10;
     string private _baseUri;
+    string public baseExtension = ".json?alt=media";
 
-    constructor() ERC721("CrownNFT", "CROWN") {
-        _tokenCounter.increment();
-    }
+    constructor() ERC721("CrownNFT", "CROWN") {}
 
     function mint(address to) external onlyOwner returns (uint256) {
+        _tokenCounter.increment();
         uint256 tokenId = _tokenCounter.current();
         require(tokenId <= MAX_SUPPLY, "CROWNNFT: More than max supply");
         _mint(to, tokenId);
-        _tokenCounter.increment();
         return tokenId;
     }
 
@@ -32,12 +31,26 @@ contract CrownNFT is ERC721Enumerable, Ownable {
         _burn(tokenId);
     }
 
+    function setExtension(string memory _extension) external onlyOwner {
+        baseExtension = _extension;
+    }
+
     function _baseURI() internal view override returns (string memory) {
         return _baseUri;
     }
 
     function setBaseUri(string calldata baseUri) external onlyOwner {
         _baseUri = baseUri;
+    }
+
+    function tokenURI(
+        uint256 _tokenId
+    ) public view virtual override returns (string memory) {
+        _requireMinted(_tokenId);
+        return
+            string(
+                abi.encodePacked(_baseUri, _tokenId.toString(), baseExtension)
+            );
     }
 
     function listTokenIds(

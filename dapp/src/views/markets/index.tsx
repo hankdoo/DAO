@@ -52,19 +52,18 @@ export default function MarketView() {
     if (!web3Provider || !wallet) return;
     const nftContract = new NftContract(web3Provider);
     const nfts = await nftContract.getListNFT(wallet.address);
-    setNfts(nfts.filter((p) => p.name));
+    setNfts(nfts);
     const marketContract = new MarketContract(web3Provider);
-    const ids = await marketContract.getNFTListedOnMarketplace();
-    const listedNfts = await nftContract.getNftInfo(ids);
+    const listedNfts = await marketContract.getListedNft();
     setNftsListed(listedNfts);
 
-    const auctionContract = new AuctionContract();
-    const auctionNfts = await auctionContract.getAuctionByStatus();
-    const myAuctions = auctionNfts.filter(
-      (p) => p.auctioneer === wallet.address
-    );
-    const nftAuctions = await nftContract.getNftAuctionInfo(myAuctions);
-    setAuctions(nftAuctions);
+    // const auctionContract = new AuctionContract();
+    // const auctionNfts = await auctionContract.getAuctionByStatus();
+    // const myAuctions = auctionNfts.filter(
+    //   (p) => p.auctioneer === wallet.address
+    // );
+    // const nftAuctions = await nftContract.getNftAuctionInfo(myAuctions);
+    // setAuctions(nftAuctions);
   }, [web3Provider, wallet]);
 
   React.useEffect(() => {
@@ -105,57 +104,56 @@ export default function MarketView() {
   };
 
   const handleListNft = async (price: number, expireDate?: Date | null) => {
-    if (!price || !web3Provider || !wallet || !nft) return;
-    setIsProcessing.on();
-    try {
-      const nftContract = new NftContract(web3Provider);
-      let tx = "";
-      if (modalType === "LISTING") {
-        const marketContract = new MarketContract(web3Provider);
-        await nftContract.approve(marketContract._contractAddress, nft.id);
-        tx = await marketContract.listNft(nft.id, price);
-      } else {
-        if (!expireDate) return;
-        const auctionContract = new AuctionContract(web3Provider);
-        await nftContract.approve(auctionContract._contractAddress, nft.id);
-        const startTime = Math.round((new Date().getTime() / 1000)  + 60);
-        tx = await auctionContract.createAuction(
-          nft.id,
-          price,
-          startTime,
-          Math.round(expireDate.getTime() / 1000) 
-        );
-      }
-      setTxHash(tx);
-      onOpenSuccess();
-      setAction(undefined);
-      setNft(undefined);
-      setIsOpen.off();
-      await getListNft();
-    } catch (er: any) {
-      console.log(er);
-      setIsProcessing.off();
-    }
+    // if (!price || !web3Provider || !wallet || !nft) return;
+    // setIsProcessing.on();
+    // try {
+    //   const nftContract = new NftContract(web3Provider);
+    //   let tx = "";
+    //   if (modalType === "LISTING") {
+    //     const marketContract = new MarketContract(web3Provider);
+    //     await nftContract.approve(marketContract._contractAddress, nft.id);
+    //     tx = await marketContract.listNft(nft.id, price);
+    //   } else {
+    //     if (!expireDate) return;
+    //     const auctionContract = new AuctionContract(web3Provider);
+    //     await nftContract.approve(auctionContract._contractAddress, nft.id);
+    //     const startTime = Math.round((new Date().getTime() / 1000)  + 60);
+    //     tx = await auctionContract.createAuction(
+    //       nft.id,
+    //       price,
+    //       startTime,
+    //       Math.round(expireDate.getTime() / 1000)
+    //     );
+    //   }
+    //   setTxHash(tx);
+    //   onOpenSuccess();
+    //   setAction(undefined);
+    //   setNft(undefined);
+    //   setIsOpen.off();
+    //   await getListNft();
+    // } catch (er: any) {
+    //   console.log(er);
+    //   setIsProcessing.off();
+    // }
   };
 
   const handleTransfer = async (toAddress: string) => {
-    setIsProcessing.on();
-    try {
-      if (!web3Provider || !nft || !wallet) return;
-
-      const nftContract = new NftContract(web3Provider);
-      await nftContract.approve(toAddress, nft.id);
-      const tx = await nftContract.safeTransferFrom(
-        wallet.address,
-        toAddress,
-        nft.id
-      );
-      setTxHash(tx);
-      setOpenTransferModal(false);
-      onOpenSuccess();
-      await getListNft();
-    } catch (ex) {}
-    setIsProcessing.off();
+    // setIsProcessing.on();
+    // try {
+    //   if (!web3Provider || !nft || !wallet) return;
+    //   const nftContract = new NftContract(web3Provider);
+    //   await nftContract.approve(toAddress, nft.id);
+    //   const tx = await nftContract.safeTransferFrom(
+    //     wallet.address,
+    //     toAddress,
+    //     nft.id
+    //   );
+    //   setTxHash(tx);
+    //   setOpenTransferModal(false);
+    //   onOpenSuccess();
+    //   await getListNft();
+    // } catch (ex) {}
+    // setIsProcessing.off();
   };
 
   return (
@@ -167,14 +165,14 @@ export default function MarketView() {
             color="#5A5A5A"
             _selected={{ borderBottomColor: "white", color: "white" }}
           >
-            ITEMS
+            My NFT
           </Tab>
           <Tab
             textTransform="uppercase"
             color="#5A5A5A"
             _selected={{ borderBottomColor: "white", color: "white" }}
           >
-            active listings
+            listings
           </Tab>
           <Tab
             textTransform="uppercase"
@@ -192,9 +190,8 @@ export default function MarketView() {
                   item={nft}
                   key={index}
                   index={index}
-                  isAuction
+                  isUnList
                   isList
-                  isTransfer
                   onAction={(a) => selectAction(a, nft)}
                 />
               ))}

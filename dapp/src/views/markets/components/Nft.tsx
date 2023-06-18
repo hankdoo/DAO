@@ -10,7 +10,6 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 
-
 interface IProps {
   item: INftItem;
   index: number;
@@ -45,6 +44,7 @@ export default function Nft({
           src={item.image}
           alt={item.name}
           objectFit="cover"
+          height={200}
           borderRadius="10px"
         />
         <Box position="absolute" top={5} right={10}>

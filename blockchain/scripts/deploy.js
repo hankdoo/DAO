@@ -42,9 +42,9 @@ async function main() {
   const Crown = await hre.ethers.deployContract("CrownNFT");
   await Crown.waitForDeployment();
   console.log(`CrownNFT address: ${Crown.target}`);
-  const Market = await hre.ethers.deployContract("Market",[Crown.target,"0x8B784D5CD20e7c61b82c3C7ead1A2C80a143824A"]);
-  await Market.waitForDeployment();
-  console.log(`Market address: ${Market.target}`);
+  // const Market = await hre.ethers.deployContract("Market",[Crown.target,"0x8B784D5CD20e7c61b82c3C7ead1A2C80a143824A"]);
+  // await Market.waitForDeployment();
+  // console.log(`Market address: ${Market.target}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

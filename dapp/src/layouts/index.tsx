@@ -26,8 +26,10 @@ export default function MainLayout({ children }: IProps) {
   // console.log("dfdfd");
 
   const dispatch = useAppDispatch();
-  const { wallet, web3Provider,balanceChange } = useAppSelector((state) => state.account);
-  
+  const { wallet, web3Provider, balanceChange } = useAppSelector(
+    (state) => state.account
+  );
+
   const onConnectMetamask = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     dispatch(setWeb3Provider(provider));
@@ -36,21 +38,29 @@ export default function MainLayout({ children }: IProps) {
   useEffect(() => {
     const init = async () => {
       if (!web3Provider) return;
-      const signer =  web3Provider.getSigner();
+      const signer = web3Provider.getSigner();
       const address = await signer.getAddress();
       const bigBalance = await signer.getBalance();
-      const ethBalance = Number.parseFloat(ethers.utils.formatEther(bigBalance));
+      const ethBalance = Number.parseFloat(
+        ethers.utils.formatEther(bigBalance)
+      );
       const winDaoContract = new WinDaoContract(web3Provider || undefined);
       const busdContract = new BusdContract(web3Provider || undefined);
       const balanceWDA = await winDaoContract.getBalanceByAddress(address);
       const balanceBUSD = await busdContract.getBalanceByAddress(address);
-      dispatch(setWalletInfo({ address, eth: ethBalance,wda:formatEtherUnit(balanceWDA.toString()),busd:formatEtherUnit(balanceBUSD.toString()) }));
+      dispatch(
+        setWalletInfo({
+          address,
+          eth: ethBalance,
+          wda: formatEtherUnit(balanceWDA.toString()),
+          busd: formatEtherUnit(balanceBUSD.toString()),
+        })
+      );
     };
 
     init();
-  }, [web3Provider,balanceChange]);
+  }, [web3Provider, balanceChange]);
 
-  
   return (
     <Flex
       w={{ base: "full", lg: "70%" }}
@@ -59,7 +69,7 @@ export default function MainLayout({ children }: IProps) {
     >
       <Flex w="full" alignItems="center" justifyContent="center">
         <Heading size="lg" fontWeight="bold">
-          Blockchain DAO
+          DAO
         </Heading>
         <Spacer />
         {menus.map((menu) => (
@@ -74,7 +84,12 @@ export default function MainLayout({ children }: IProps) {
 
         {!wallet && <ConnectWallet onClick={onConnectMetamask} />}
         {wallet && (
-          <WalletInfo address={wallet?.address} amountETH={wallet?.eth || 0} amountWDA={wallet?.wda || 0} amountBUSD={wallet?.busd || 0} />
+          <WalletInfo
+            address={wallet?.address}
+            amountETH={wallet?.eth || 0}
+            amountWDA={wallet?.wda || 0}
+            amountBUSD={wallet?.busd || 0}
+          />
         )}
       </Flex>
       <Flex w="full" flexDirection="column" py="50px">
