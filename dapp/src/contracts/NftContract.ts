@@ -22,10 +22,13 @@ export default class NftContract extends Erc721 {
     const urls: BigNumber[] = await this._contract.listTokenIds(address);
     return urls.map((id: BigNumber) => id.toString());
   };
+   tokenURI = async (id: string|number) => {
+    return await this._contract.tokenURI(id);
+  };
+  
 
   getListNFT = async (address: string): Promise<INftItem[]> => {
     const ids = await this._listTokenIds(address);
-
     return Promise.all(
       ids.map(async (id) => {
         const tokenUrl = await this._contract.tokenURI(id);

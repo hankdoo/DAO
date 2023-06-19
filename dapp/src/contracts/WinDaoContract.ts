@@ -1,5 +1,5 @@
 import { IAuctionInfo, IWalletInfo } from "@/_types_";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { BaseInterface } from "./interfaces";
 import { getRPC } from "./utils/common";
 import { getAuctionAbi, getWinDaoAbi } from "./utils/getAbis";
@@ -24,6 +24,12 @@ export default class WinDaoContract extends BaseInterface {
     return await this._contract.balanceOf(address);
   };
 
+
+  approve = async (spender:string,amount: BigNumber): Promise<any> => {
+    const tx: TransactionResponse = await this._contract.approve(spender,amount);
+    return this._handleTransactionResponse(tx);
+  };
+
   transfer = async (toAddress: string, amount: number): Promise<any> => {
     const signer = await this._provider.getSigner();
     this._contract = new ethers.Contract(
@@ -37,6 +43,7 @@ export default class WinDaoContract extends BaseInterface {
     );
     return this._handleTransactionResponse(tx);
   };
+
 
   // getBalanceByAddress = async (): Promise<IAuctionInfo[]> => {
   //   const rs = await this._contract.getAuctionByStatus(true);

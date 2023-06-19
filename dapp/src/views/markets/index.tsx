@@ -1,31 +1,32 @@
+import { ActionType, IAuctionInfo, INftItem } from "@/_types_";
 import { SuccessModal } from "@/components";
 import ProcessingModal from "@/components/ProcessingModal";
+import AuctionContract from "@/contracts/AuctionContract";
 import MarketContract from "@/contracts/MarketContract";
 import NftContract from "@/contracts/NftContract";
 import { useAppSelector } from "@/reduxs/hooks";
-import { ActionType, IAuctionInfo, INftItem } from "@/_types_";
 import {
   Flex,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
   SimpleGrid,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   useBoolean,
   useDisclosure,
 } from "@chakra-ui/react";
 import React from "react";
-import Nft from "./components/Nft";
-import ListModal from "./components/ListModal";
 import NftAuction from "../auctions/components/NftAuction";
-import AuctionContract from "@/contracts/AuctionContract";
-import TransferModal from "./components/TransferModal";
+import ListModal from "./components/ListModal";
+import Nft from "./components/Nft";
+import SellModal from "./components/SellModal";
+import UpdateModal from "./components/UpdateModal";
 
 export default function MarketView() {
   const { web3Provider, wallet } = useAppSelector((state) => state.account);
-  const [nfts, setNfts] = React.useState<INftItem[]>([]);
-  const [nftsListed, setNftsListed] = React.useState<INftItem[]>([]);
+  const [nfts, setnfts] = React.useState<INftItem[]>([]);
+  const [nftsListed, setnftsListed] = React.useState<INftItem[]>([]);
   const [auctions, setAuctions] = React.useState<IAuctionInfo[]>([]);
 
   const [nft, setNft] = React.useState<INftItem>();
@@ -39,8 +40,8 @@ export default function MarketView() {
     "LISTING"
   );
 
-  const [isOpenTransferModal, setOpenTransferModal] =
-    React.useState<boolean>(false);
+  const [isOpenSellModal, setOpenSellModal] = React.useState<boolean>(false);
+  const [isOpenUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
 
   const {
     isOpen: isSuccess,
@@ -52,14 +53,14 @@ export default function MarketView() {
     if (!web3Provider || !wallet) return;
     const nftContract = new NftContract(web3Provider);
     const nfts = await nftContract.getListNFT(wallet.address);
-    setNfts(nfts);
+    setnfts(nfts);
     const marketContract = new MarketContract(web3Provider);
-    const listedNfts = await marketContract.getListedNft();
-    setNftsListed(listedNfts);
+    const listednfts = await marketContract.getListedNft(wallet.address);
+    setnftsListed(listednfts);
 
     // const auctionContract = new AuctionContract();
-    // const auctionNfts = await auctionContract.getAuctionByStatus();
-    // const myAuctions = auctionNfts.filter(
+    // const auctionnfts = await auctionContract.getAuctionByStatus();
+    // const myAuctions = auctionnfts.filter(
     //   (p) => p.auctioneer === wallet.address
     // );
     // const nftAuctions = await nftContract.getNftAuctionInfo(myAuctions);
@@ -95,7 +96,27 @@ export default function MarketView() {
         break;
       }
       case "TRANSFER": {
-        setOpenTransferModal(true);
+        setOpenSellModal(true);
+        break;
+      }
+      case "SELL": {
+        setOpenSellModal(true);
+        break;
+      }
+      case "BUY": {
+        setIsProcessing.on();
+        await handleBuy(item);
+        setIsProcessing.off();
+        break;
+      }
+      case "UPDATE": {
+        setOpenUpdateModal(true);
+        break;
+      }
+      case "SELLOF": {
+        setIsProcessing.on();
+        await handleSellOf(item);
+        setIsProcessing.off();
         break;
       }
       default:
@@ -127,7 +148,7 @@ export default function MarketView() {
     //   }
     //   setTxHash(tx);
     //   onOpenSuccess();
-    //   setAction(undefined);
+    //   setAction(undefined);f
     //   setNft(undefined);
     //   setIsOpen.off();
     //   await getListNft();
@@ -137,25 +158,77 @@ export default function MarketView() {
     // }
   };
 
-  const handleTransfer = async (toAddress: string) => {
-    // setIsProcessing.on();
-    // try {
-    //   if (!web3Provider || !nft || !wallet) return;
-    //   const nftContract = new NftContract(web3Provider);
-    //   await nftContract.approve(toAddress, nft.id);
-    //   const tx = await nftContract.safeTransferFrom(
-    //     wallet.address,
-    //     toAddress,
-    //     nft.id
-    //   );
-    //   setTxHash(tx);
-    //   setOpenTransferModal(false);
-    //   onOpenSuccess();
-    //   await getListNft();
-    // } catch (ex) {}
-    // setIsProcessing.off();
-  };
+  const handleSell = async (price: number) => {
+    console.log(price);
+    if (price <= 0) {
+      alert("Invalid price");
+      return
 
+    }
+    setIsProcessing.on();
+    try {
+      if (!web3Provider || !nft || !wallet) return;
+      const marketContract = new MarketContract(web3Provider);
+      const tx = await marketContract.upToSell(nft.id, price);
+      setTxHash(tx);
+      setOpenSellModal(false);
+      onOpenSuccess();
+      await getListNft();
+    } catch (ex: any) {
+      console.log(ex);
+      alert(ex?.reason);
+    }
+    setIsProcessing.off();
+  };
+  const handleUpdate = async (price: number) => {
+    console.log(price);
+    if (price <= 0) {
+      alert("Invalid price");
+      return
+    }
+    setIsProcessing.on();
+    try {
+      if (!web3Provider || !nft || !wallet) return;
+      const marketContract = new MarketContract(web3Provider);
+      const tx = await marketContract.updateListedNftPrice(nft.id,price);
+      setTxHash(tx);
+      setOpenUpdateModal(false);
+      onOpenSuccess();
+      await getListNft();
+    } catch (ex: any) {
+      console.log(ex);
+      alert(ex?.reason);
+    }
+    setIsProcessing.off();
+  };
+  const handleBuy = async (nft: INftItem) => {
+    try {
+      if (!web3Provider || !nft || !wallet) return;
+      const marketContract = new MarketContract(web3Provider);
+      const tx = await marketContract.buyNFT(nft);
+      setTxHash(tx);
+      setOpenSellModal(false);
+      onOpenSuccess();
+      await getListNft();
+    } catch (ex: any) {
+      console.log(ex);
+      alert(ex?.reason);
+    }
+  };
+  const handleSellOf = async (nft: INftItem) => {
+    try {
+      if (!web3Provider || !nft || !wallet) return;
+      const marketContract = new MarketContract(web3Provider);
+      const tx = await marketContract.sellOff(nft.id.toString());
+      setTxHash(tx);
+      setOpenSellModal(false);
+      onOpenSuccess();
+      await getListNft();
+    } catch (ex: any) {
+      console.log(ex);
+      alert(ex?.reason);
+    }
+  };
   return (
     <Flex w="full">
       <Tabs>
@@ -190,8 +263,7 @@ export default function MarketView() {
                   item={nft}
                   key={index}
                   index={index}
-                  isUnList
-                  isList
+                  isMyList
                   onAction={(a) => selectAction(a, nft)}
                 />
               ))}
@@ -205,7 +277,7 @@ export default function MarketView() {
                   item={nft}
                   key={index}
                   index={index}
-                  isUnList
+                  isList
                   onAction={(a) => selectAction(a, nft)}
                 />
               ))}
@@ -241,7 +313,7 @@ export default function MarketView() {
         </TabPanels>
       </Tabs>
 
-      <ProcessingModal isOpen={isUnlist} onClose={() => {}} />
+      <ProcessingModal isOpen={isProcessing} onClose={() => {}} />
       <ListModal
         type={modalType}
         isOpen={isOpen}
@@ -251,13 +323,21 @@ export default function MarketView() {
         onList={(amount, expireDate) => handleListNft(amount, expireDate)}
       />
 
-      <TransferModal
-        isOpen={isOpenTransferModal}
+      <SellModal
+        isOpen={isOpenSellModal}
         nft={nft}
-        isTransfer={isProcessing}
-        onClose={() => setOpenTransferModal(false)}
-        onTransfer={(toAddress) => handleTransfer(toAddress)}
+        isSell={isProcessing}
+        onClose={() => setOpenSellModal(false)}
+        onSell={(price: number) => handleSell(price)}
       />
+       <UpdateModal
+        isOpen={isOpenUpdateModal}
+        nft={nft}
+        isUpdate={isProcessing}
+        onClose={() => setOpenUpdateModal(false)}
+        onUpdate={(price: number) => handleUpdate(price)}
+      />
+
 
       <SuccessModal
         hash={txHash}

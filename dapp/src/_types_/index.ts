@@ -1,3 +1,5 @@
+import { BigNumber } from "ethers";
+
 export interface IWalletInfo {
   address: string;
   eth: number;
@@ -43,6 +45,7 @@ export interface INftItem {
   //Listing
   price?: number;
   author?: string;  
+  isMyNft?: boolean;  
 }
 
 export enum Clarity {
@@ -55,7 +58,7 @@ export enum Clarity {
   "SS",
   "SSS",
 }
-export type ActionType = "LIST" | "UNLIST" | "TRANSFER" | "AUCTION";
+export type ActionType = "LIST" | "UNLIST" | "TRANSFER" | "AUCTION"|"SELL"|"BUY"|"SELLOF"|"UPDATE";
 
 export interface IAuctionInfo extends  INftItem {
   auctionId: number;

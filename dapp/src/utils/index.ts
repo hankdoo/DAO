@@ -10,8 +10,8 @@ export const showSortAddress = (address?: string): string => {
   )}`;
 };
 
-export const formatEtherUnit = (number: string): number => {
-  return Number(ethers.utils.formatUnits(number));
+export const formatEtherUnit = (number?: number): number => {
+  return Number(ethers.utils.formatUnits(number||0));
 };
 
 export const formatToEth = (amount: number): BigNumber => {

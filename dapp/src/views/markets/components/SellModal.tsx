@@ -19,17 +19,17 @@ import DatePicker from "react-datepicker";
 
 interface IProps extends Omit<ModalProps, "children"> {
   nft?: INftItem;
-  isTransfer?: boolean;
-  onTransfer?: (toAddress: string) => void;
+  isSell?: boolean;
+  onSell?: (price: number) => void;
 }
 
-export default function TransferModal({
+export default function SellModal({
   nft,
-  isTransfer,
-  onTransfer,
+  isSell,
+  onSell,
   ...props
 }: IProps) {
-  const [toAddress, setToAddress] = React.useState<string>();
+  const [price, setPrice] = React.useState<string>();
   return (
     <Modal closeOnOverlayClick={false} {...props}>
       <ModalOverlay
@@ -41,7 +41,7 @@ export default function TransferModal({
         <ModalCloseButton />
         <ModalBody>
           <Flex alignItems="center" w="full" direction="column">
-            <Heading size="md" mb="10px">TRANSFER NFT</Heading>
+            <Heading size="md" mb="10px">SELL NFT</Heading>
             <Image
               src={nft?.image}
               alt={nft?.name}
@@ -51,22 +51,24 @@ export default function TransferModal({
             />
             <Flex w="full" direction="column">
               <Text fontWeight="bold">
-                To wallet
+                Price:
               </Text>
               <Flex w="full" my="10px">
                 <Input
                   w="full"
-                  placeholder="Input wallet address"
-                  value={toAddress}
-                  onChange={(e) => setToAddress(e.target.value)}
+                  placeholder="Input price"
+                  value={price}
+                  min={1}
+                  type="number"
+                  onChange={(e) => setPrice(e.target.value)}
                 />
               </Flex>
               <Button
                 variant="primary"
-                onClick={() => onTransfer && toAddress && onTransfer(toAddress)}
-                disabled={!toAddress || isTransfer}
+                onClick={() => onSell && price && onSell(price)}
+                disabled={!price || isSell}
               >
-                {isTransfer ? <Spinner /> : 'Transfer now' }
+                {isSell ? <Spinner /> : 'Sell now' }
               </Button>
             </Flex>
           </Flex>

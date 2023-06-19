@@ -4,64 +4,59 @@ const {
 } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
-
-describe("Seed wallet", function () {
+describe("Auction", function () {
   async function deploySeedWalletFixture() {
     const [owner, account1] = await ethers.getSigners();
 
     //WINDAO
     const WinDAO = await ethers.getContractFactory("WINDAO");
     const windao = await WinDAO.deploy();
-    const windaoAddress = await windao.getAddress()
+    const windaoAddress = await windao.getAddress();
     //BUSD
-    const BUSD = await ethers.getContractFactory("BUSD");
-    const busd = await BUSD.deploy();
-    const busdAddress = await busd.getAddress()
-
-    //SEED
-    const SeedWallet = await ethers.getContractFactory("SeedWallet");
-    const seedWallet = await SeedWallet.deploy(busdAddress,windaoAddress);
-    return { seedWallet, owner, account1 };
+    const CROWN = await ethers.getContractFactory("CrownNFT");
+    const crown = await CROWN.deploy();
+    const crownAddress = await crown.getAddress();
+    //AUCTION
+    const Auction = await ethers.getContractFactory("Auction");
+    const auction = await Auction.deploy(crownAddress, windaoAddress);
+    return { auction, windao, crown, owner, account1 };
   }
 
-  describe("Deployment", async function () {
-    it("Should owner", async function () {
-      const { seedWallet, owner, account1 } = await loadFixture(
-        deploySeedWalletFixture
-      );
-      expect(await seedWallet.owner()).to.equal(owner.address);
-    });
-
-    it("Should min less than or equal to max", async function () {
-      const { seedWallet, owner, account1 } = await loadFixture(
-        deploySeedWalletFixture
-      );
-
-      await seedWallet.initialize()
-
-      expect(await seedWallet.owner()).to.equal(owner.address);
-    });
-
-    // it("Should receive and store the funds to lock", async function () {
-    //   const { lock, lockedAmount } = await loadFixture(
-    //     deployOneYearLockFixture
-    //   );
-
-    //   expect(await ethers.provider.getBalance(lock.target)).to.equal(
-    //     lockedAmount
-    //   );
-    // });
-
-    // it("Should fail if the unlockTime is not in the future", async function () {
-    //   // We don't use the fixture here because we want a different deployment
-    //   const latestTime = await time.latest();
-    //   const Lock = await ethers.getContractFactory("Lock");
-    //   await expect(Lock.deploy(latestTime, { value: 1 })).to.be.revertedWith(
-    //     "Unlock time should be in the future"
-    //   );
-    // });
+  let owner, account1, windao, crown, auction;
+  beforeEach(async () => {
+    [owner, account1] = await ethers.getSigners();
+    //WINDAO
+    const WinDAO = await ethers.getContractFactory("WINDAO");
+    windao = await WinDAO.deploy();
+    const windaoAddress = await windao.getAddress();
+    //BUSD
+    const CROWN = await ethers.getContractFactory("CrownNFT");
+    crown = await CROWN.deploy();
+    const crownAddress = await crown.getAddress();
+    //AUCTION
+    const Auction = await ethers.getContractFactory("Auction");
+    auction = await Auction.deploy(crownAddress, windaoAddress);
   });
+  it("Should auction ", async function () {
+    await crown.mint(owner.address);
+    await crown.safeTransferFrom(owner.address, account1.address, 1);
+    const currentTimeStamp = Math.floor(Date.now() / 1000);
+    const amountToCreateAuction = 500 * 10 ** 3
+    const tokenId=1;
+    const crownAddress = await auction.getAddress()
+    console.log(account1.address);
 
+    await crown.connect(account1).approve(crownAddress,tokenId)
+    await auction
+      .connect(account1)
+      .createAuction(
+        tokenId,
+        amountToCreateAuction,
+        currentTimeStamp + 60,
+        currentTimeStamp + 120
+      );
+    // console.log(await auction.auctions());
+  });
   //   describe("Withdrawals", function () {
   //     describe("Validations", function () {
   //       it("Should revert with the right error if called too soon", async function () {

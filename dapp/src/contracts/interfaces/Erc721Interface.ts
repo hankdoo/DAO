@@ -29,7 +29,8 @@ class Erc721 extends BaseInterface {
   }
 
   async approve(toAddress: string, tokenId: string | number) {
-      return this._contract.approve(toAddress, tokenId);
+    const tx: TransactionResponse = await this._contract.approve(toAddress, tokenId);
+    return this._handleTransactionResponse(tx);
   }
 
   async safeTransferFrom(fromAddress: string, toAddress: string, tokenId: string | number): Promise<string> {

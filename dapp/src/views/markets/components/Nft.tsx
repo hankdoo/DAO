@@ -1,4 +1,5 @@
 import { Clarity, INftItem, ActionType } from "@/_types_";
+import { formatEtherUnit, numberFormat, showSortAddress } from "@/utils";
 import {
   Flex,
   Image,
@@ -8,14 +9,15 @@ import {
   SimpleGrid,
   Button,
 } from "@chakra-ui/react";
+import { formatUnits } from "ethers/lib/utils";
 import React from "react";
 
 interface IProps {
   item: INftItem;
   index: number;
-  isTransfer?: boolean;
   isUnList?: boolean;
   isList?: boolean;
+  isMyList?: boolean;
   isAuction?: boolean;
   onAction?: (action: ActionType) => void;
 }
@@ -23,10 +25,10 @@ interface IProps {
 export default function Nft({
   item,
   index,
-  isTransfer,
   isAuction,
   isList,
   isUnList,
+  isMyList,
   onAction,
 }: IProps) {
   return (
@@ -45,24 +47,49 @@ export default function Nft({
           alt={item.name}
           objectFit="cover"
           height={200}
+          width={250}
           borderRadius="10px"
         />
-        <Box position="absolute" top={5} right={10}>
+        {/* <Box position="absolute" top={5} right={10}>
           <Text fontWeight="bold" fontSize="40px" fontStyle="italic">
             {
-              Clarity[
-                item.attributes?.find((p) => p.trait_type === "Rarity")
-                  ?.value || 0
-              ]
+             1111
             }
           </Text>
-        </Box>
+        </Box> */}
         <HStack bg="rgba(0,0,0,0.4)" position="absolute" top={5} px="10px">
           <Text>ID: {item.id.toString().padStart(5, "0")}</Text>
         </HStack>
       </Box>
-      <Text fontWeight="bold" py="10px">
+      <Text fontWeight="bold" py="5px">
         {item.name}
+      </Text>
+      {isList && (
+        <>
+          <Text color={"Highlight"} py="5px" fontSize={15}>
+            {(item.isMyNft && "Me") || showSortAddress(item.author)}
+          </Text>
+        <Box alignItems={'center'} height={100}>
+        <Text color={"yellow"} py="5px" fontSize={15} textAlign={'center'}>
+            {numberFormat(formatEtherUnit(item?.price))} WDA
+          </Text>
+
+          {item.isMyNft && (
+            <Button
+              variant={"outline"}
+              w="full"
+              m="5px"
+              size={"xs"}
+              onClick={() => onAction && onAction("UPDATE")}
+            >
+              Update Price
+            </Button>
+          )}
+        </Box>
+        </>
+      )}
+      <Text p="5px" fontSize={14}>
+        {item.description}
       </Text>
       {isList && isAuction && (
         <SimpleGrid w="full" columns={2} spacingX="10px">
@@ -80,25 +107,28 @@ export default function Nft({
           </Button>
         </SimpleGrid>
       )}
-      {isTransfer && (
+
+      {isList && (
         <Button
-          variant="primary"
+          variant={"primary"}
           w="full"
           mt="10px"
-          onClick={() => onAction && onAction("TRANSFER")}
+          onClick={() =>
+            onAction && item.isMyNft ? onAction("SELLOF") : onAction("BUY")
+          }
         >
-          Transfer
+          {(item.isMyNft && "SellOf") || "Buy"}
         </Button>
       )}
 
-      {isUnList && (
+      {isMyList && (
         <Button
           variant="primary"
           w="full"
           mt="10px"
-          onClick={() => onAction && onAction("UNLIST")}
+          onClick={() => onAction && onAction("SELL")}
         >
-          UnList
+          Sell
         </Button>
       )}
     </Flex>
