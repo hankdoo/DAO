@@ -15,11 +15,11 @@ contract CrownNFT is ERC721Enumerable, Ownable {
 
     constructor() ERC721("CrownNFT", "CROWN") {}
 
-    function mint(address to) external onlyOwner returns (uint256) {
+    function safeMint(address to) public onlyOwner returns (uint256) {
         _tokenCounter.increment();
         uint256 tokenId = _tokenCounter.current();
         require(tokenId <= MAX_SUPPLY, "CROWNNFT: More than max supply");
-        _mint(to, tokenId);
+        _safeMint(to, tokenId);
         return tokenId;
     }
 
