@@ -1,4 +1,4 @@
-import { HStack, Text } from "@chakra-ui/react";
+// import { HStack, Text } from "@chakra-ui/react";
 import DateTimeDisplay from "./DateTimeDisplay";
 import { useCountdown } from "./useCountdown";
 
@@ -14,7 +14,10 @@ const ShowCounter = ({
   seconds: number;
 }) => {
   return (
-    <HStack px="0px" spacing="2px">
+   <>
+   
+   
+   {/* <HStack px="0px" spacing="2px">
       <Text fontSize="15px" px="0px">{days}</Text>    
       <Text fontSize="15px">:</Text> 
       <Text fontSize="15px">{hours}</Text>     
@@ -23,7 +26,8 @@ const ShowCounter = ({
       <Text fontSize="15px">:</Text> 
       <Text fontSize="15px">{seconds.toString().padStart(2, '0')}</Text>           
       <Text fontSize="15px">left</Text>
-    </HStack>
+    </HStack> */}
+   </>
   );
 };
 

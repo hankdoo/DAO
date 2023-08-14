@@ -1,16 +1,16 @@
 import { numberFormat } from "@/utils";
 import { Clarity, INftItem, ActionType, IAuctionInfo } from "@/_types_";
-import {
-  Flex,
-  Image,
-  Box,
-  Text,
-  HStack,
-  SimpleGrid,
-  Button,
-  VStack,
-  Spacer,
-} from "@chakra-ui/react";
+// import {
+//   Flex,
+//   Image,
+//   Box,
+//   Text,
+//   HStack,
+//   SimpleGrid,
+//   Button,
+//   VStack,
+//   Spacer,
+// } from "@chakra-ui/react";
 import React from "react";
 import CountdownTimer from "./CountDownTimer";
 
@@ -22,7 +22,9 @@ interface IProps {
 
 export default function NftAuction({ item, isCancel, onAction }: IProps) {
   return (
-    <Flex
+    <>
+    
+    {/* <Flex
       justifyContent="center"
       alignItems="center"
       flexDirection="column"
@@ -72,6 +74,8 @@ export default function NftAuction({ item, isCancel, onAction }: IProps) {
           {isCancel ? 'Cancel' : 'Place a bid'}
         </Button>        
       </SimpleGrid>
-    </Flex>
+    </Flex> */}
+    
+    </>
   );
 }

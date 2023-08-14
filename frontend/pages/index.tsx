@@ -3,12 +3,12 @@ import Head from 'next/head'
 import Image from 'next/image'
 import InvestView from '../src/views/invests'
 import styles from '../styles/Home.module.css'
-import MarketView from '@/views/markets'
+import CollectionView from '@/views/market'
+import HomeView from '@/views/home'
 
 const Home: NextPage = () => {
   return (
-    <MarketView />
-  
+    <HomeView />
   )
 }
 

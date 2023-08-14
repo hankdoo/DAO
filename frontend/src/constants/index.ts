@@ -52,7 +52,15 @@ export const packages: IPackage[] = [
 ]
 
 export const menus: IMenu[] = [
-  {name: 'Market', url: '/'},
-  {name: 'Auction', url: '/auction'},
-  {name: 'Tokenomic', url: '/tokenomic'},
+  // {name: '', url: '/'},
+  {
+    name: 'Market',
+    url:'/market',
+    childrens: [
+      { name: 'Collections', url: '/market/collections', childrens: [] }
+    ]
+  },
+  // {name: 'Market', url: '/market'},
+  // {name: 'Auction', url: '/auction'},
+  // {name: 'Tokenomic', url: '/tokenomic'},
 ]

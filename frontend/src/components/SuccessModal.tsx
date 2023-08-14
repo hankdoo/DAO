@@ -1,16 +1,19 @@
-import {
-  Modal,
-  ModalOverlay,
-  ModalProps,
-  ModalContent,
-  ModalBody,
-  Text,
-  Button,
-  Flex,
-  ModalCloseButton,
-} from "@chakra-ui/react";
+// import {
+//   Modal,
+//   ModalOverlay,
+//   ModalProps,
+//   ModalContent,
+//   ModalBody,
+//   Text,
+//   Button,
+//   Flex,
+//   ModalCloseButton,
+// } from "@chakra-ui/react";
 import { showTransactionHash } from "../utils";
 
+interface ModalProps{
+
+}
 interface IProps extends Omit<ModalProps, "children"> {
   hash?: string;
   title?: string;
@@ -19,12 +22,13 @@ interface IProps extends Omit<ModalProps, "children"> {
 export default function SuccessModal({ hash, title, ...props }: IProps) {
   const onNavigation = () => {
     if (window) {
-      window.open(`https://mumbai.polygonscan.com/tx/${hash}`, '_blank');
+      // window.open(`https://mumbai.polygonscan.com/tx/${hash}`, '_blank');
     }
   };
 
   return (
-    <Modal closeOnOverlayClick={false} {...props}>
+   <>
+    {/* <Modal closeOnOverlayClick={false} {...props}>
       <ModalOverlay
         blur="2xl"
         bg="blackAlpha.300"
@@ -52,6 +56,7 @@ export default function SuccessModal({ hash, title, ...props }: IProps) {
           </Flex>
         </ModalBody>
       </ModalContent>
-    </Modal>
+    </Modal> */}
+    </>
   );
 }

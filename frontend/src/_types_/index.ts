@@ -29,6 +29,7 @@ export interface IPackage {
 export interface IMenu {
   name: string;
   url: string;
+  childrens:IMenu[]
 }
 
 export interface IAttribute {

@@ -11,11 +11,10 @@ import {
 } from "@/reduxs/accounts/account.slices";
 import { useAppDispatch, useAppSelector } from "@/reduxs/hooks";
 import { formatEtherUnit, numberFormat } from "@/utils";
-import { Flex, Heading, Spacer, Text } from "@chakra-ui/react";
 import { ethers } from "ethers";
-import Link from "next/link";
-import { useRouter } from "next/router";
 import React, { ReactNode, useEffect } from "react";
+import Header from "./header/Header";
+import Footer from "./footer/Footer";
 interface IProps {
   children: ReactNode;
 }
@@ -31,8 +30,8 @@ export default function MainLayout({ children }: IProps) {
   );
 
   const onConnectMetamask = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    dispatch(setWeb3Provider(provider));
+    // const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // dispatch(setWeb3Provider(provider));
   };
 
   useEffect(() => {
@@ -62,7 +61,11 @@ export default function MainLayout({ children }: IProps) {
   }, [web3Provider, balanceChange]);
 
   return (
-    <Flex
+    <>
+      <Header />
+        {children}
+        <Footer />
+      {/* <Flex
       w={{ base: "full", lg: "70%" }}
       flexDirection="column"
       margin="50px auto"
@@ -92,9 +95,8 @@ export default function MainLayout({ children }: IProps) {
           />
         )}
       </Flex>
-      <Flex w="full" flexDirection="column" py="50px">
-        {children}
-      </Flex>
-    </Flex>
+     
+    </Flex> */}
+    </>
   );
 }
